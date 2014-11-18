@@ -47,6 +47,7 @@ You can check the _skywalker\_genealogy.json_ for a complete example.
 [d3.js](http://d3js.org) only.
 
 ## Parameters
+
 - *main_svg_width* : main <svg> window width in pixels
 - *main_svg_height* : main <svg> window height in pixels
 - *main_svg_html_anchor_selector* : CSS selector to the HTML element where the main <svg> window will be created
@@ -59,6 +60,7 @@ You can check the _skywalker\_genealogy.json_ for a complete example.
 - *packing_generation_factor* : control the differences in sizes of the node circles: it must always be higher than the tree max depth,
 with high values meaning that all circles will be the same size
 - *d3_color_scale* : cf. https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
+- *post_rendering_callback* : if defined, this function will be executed once d3.js rendering over
 
 The list of all those parameters default values can be found in the source code here:
 https://github.com/Lucas-C/genealogic-d3/blob/master/genealogic-d3.js#L93
@@ -66,12 +68,13 @@ https://github.com/Lucas-C/genealogic-d3/blob/master/genealogic-d3.js#L93
 ## Notes
 This visualization tool can be combined with an 'upload-and-crop-your-own-picture' plugin,
 to let members of the family upload their photos themselves. E.g. :
+
     * https://github.com/acornejo/jquery-cropbox
     * https://github.com/TuyoshiVinicius/jQuery-Picture-Cut
     * https://github.com/andyvr/picEdit
 
 ## License
-Tl;dr plain English version: https://tldrlegal.com/license/adaptive-public-license-1.0-%28apl-1.0%29#fulltext
+Tl;dr plain English version: https://tldrlegal.com/license/adaptive-public-license-1.0-%28apl-1.0%29
 
 ## Skywalker family pictures sources
 - Anakin: http://ferigato.deviantart.com/art/Darth-Vader-58658508
@@ -85,6 +88,7 @@ Tl;dr plain English version: https://tldrlegal.com/license/adaptive-public-licen
 - Jaina: http://deepstriker.deviantart.com/art/Jaina-Solo-409556979
 
 ## ToDo
+- more code source comments
 - cyclotymic complexity below 5
 - better handle homonyms
 - mobile-friendly responsive version

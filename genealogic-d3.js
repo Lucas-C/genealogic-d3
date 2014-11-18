@@ -36,8 +36,8 @@ var genealogic = (function () {
     },
     pre_process_nodes = function (node, generation) {
         node.generation = (typeof node.generation !== 'undefined' ? node.generation : generation || 0);
-        if (node.partner) {
-            node.partner.by_alliance_with = node;
+        if (node.partner) { // Adding as a child node
+            node.partner.by_alliance_with = node.name;
             node.partner.generation = node.generation;
             if (node.children) {
                 node.children.push(node.partner);
@@ -45,12 +45,12 @@ var genealogic = (function () {
                 node.children = [node.partner];
             }
         }
-        if (node.children) {
-            node.itself = {};
-            for (var k in node) { node.itself[k] = node[k]; }
-            delete node.itself.children;
-            delete node.itself.partner;
-            node.children.push(node.itself);
+        if (node.children) { // Making a shallow child copy
+            var itself = {}; for (var k in node) { itself[k] = node[k]; }
+            delete itself.children; // To avoid processing them twice & recursion
+            delete itself.partner; // To avoid processing it twice
+            node.itself = itself;
+            node.children.push(itself);
         }
         for (var i = 0; i < (node.children ? node.children.length : 0); i++) {
             pre_process_nodes(node.children[i], node.generation + 1);
@@ -97,19 +97,20 @@ var genealogic = (function () {
     },
     generate = function (args) {
         args = args || {};
-        var main_svg_width = args.main_svg_width || 800,
-            main_svg_height = args.main_svg_height || 800,
+        var main_svg_width = +args.main_svg_width || 800,
+            main_svg_height = +args.main_svg_height || 800,
             main_svg_html_anchor_selector = args.main_svg_html_anchor_selector || 'body',
             json_input_genealogy = args.json_input_genealogy || 'genealogy.json',
             path_to_miniature_imgs = args.path_to_miniature_imgs, // if evaluate to false, only use optional .miniature_img_url
             miniature_img_ext = args.miniature_img_ext || '.jpg',
-            use_fixed_miniature = (typeof args.use_fixed_miniature !== 'undefined' ? args.use_fixed_miniature : true),
+            use_fixed_miniature = !!(typeof args.use_fixed_miniature !== 'undefined' ? args.use_fixed_miniature : true),
             miniature_svg_html_anchor_selector = args.miniature_svg_html_anchor_selector || 'body',
-            miniature_photo_size = args.miniature_photo_size || 300,
-            packing_generation_factor = args.packing_generation_factor, // default value is set later on as $genealogy_max_depth - 0.5
+            miniature_photo_size = +args.miniature_photo_size || 300,
+            packing_generation_factor = +args.packing_generation_factor, // default value is set later on as $genealogy_max_depth - 0.5
             d3_color_scale = args.d3_color_scale || 'category20',
             leaf_name_dy = args.leaf_text_dy || '0.3em',
             leaf_caption_dy = args.leaf_text_dy || '1.8em',
+            post_rendering_callback = args.post_rendering_callback,
             fill = d3.scale[d3_color_scale](),
             svg = d3.select(main_svg_html_anchor_selector).append('svg')
                 .attr('id', 'genealogic')
@@ -132,7 +133,11 @@ var genealogic = (function () {
         var display_genealogy = function (json) {
             load_img_patterns(json, path_to_miniature_imgs, miniature_img_ext);
             pre_process_nodes(json);
-            packing_generation_factor = packing_generation_factor || get_max_depth(json) - 0.5;
+
+            var max_tree_depth = get_max_depth(json);
+            if (!packing_generation_factor || packing_generation_factor <= max_tree_depth - 1) {
+                packing_generation_factor = max_tree_depth - 0.5;
+            }
 
             var links = convert_to_links(json),
                 pack = d3.layout.pack()
@@ -170,6 +175,10 @@ var genealogic = (function () {
                 .attr('class', 'branch')
                 .style('stroke', function(d) { return d3.rgb(fill(d.target.by_alliance_with + 1)).darker(); })
                 .attr('d', linkArc);
+
+            if (post_rendering_callback) {
+                post_rendering_callback();
+            }
         };
 
         if (typeof json_input_genealogy === 'string') {
