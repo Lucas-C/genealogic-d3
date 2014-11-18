@@ -1,6 +1,6 @@
 var genealogic = (function () { /* exported genealogic */
     'use strict';
-    var CONFIG_DEFAULTS = {
+    var CONFIG_DEFAULTS = Object.freeze({
         main_svg_width: 800,
         main_svg_height: 800,
         main_svg_html_anchor_selector: 'body',
@@ -15,14 +15,16 @@ var genealogic = (function () { /* exported genealogic */
         leaf_name_dy: '0.3em',
         leaf_caption_dy: '1.8em',
         post_rendering_callback: false,
-    },
-    extend = function (extended, update) {
-        for (var key in update) {
-            if (update.hasOwnProperty(key)) {
-                extended[key] = update[key];
+    }),
+    extend = function () { // jQuery.extend equivalent
+        for (var i = 1; i < arguments.length; i++) {
+            for (var key in arguments[i]) {
+                if (arguments[i].hasOwnProperty(key)) {
+                    arguments[0][key] = arguments[i][key];
+                }
             }
         }
-        return (arguments[2] ? extend.apply(extended, [].slice.call(arguments, 1)) : extended);
+        return arguments[0];
     },
     string_to_valid_id = function (str) { // Removes any non-letter/digit/- character
         return str.replace(/[^a-zA-Z0-9-]/g, '');
@@ -200,10 +202,9 @@ var genealogic = (function () { /* exported genealogic */
         }
     },
     remove = function (args) {
-        args = args || {};
-        var html_anchor_selector = args.html_anchor_selector || 'body';
-        d3.select(html_anchor_selector).select('svg#genealogic').remove();
-        d3.select(html_anchor_selector).select('svg#miniature').remove();
+        var conf = extend({}, CONFIG_DEFAULTS, args);
+        d3.select(conf.main_svg_html_anchor_selector).select('svg#genealogic').remove();
+        d3.select(conf.miniature_svg_html_anchor_selector).select('svg#miniature').remove();
     };
     return {
         generate: generate,

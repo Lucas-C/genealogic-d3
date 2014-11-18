@@ -1,7 +1,7 @@
 {
     // Code complexity control
     "maxparams": 4,
-    "maxdepth": 2,
+    "maxdepth": 3,
     // Avoid "Bad line breaking before '+'"
     "laxbreak": true,
     // Inspired by airbnb/javascript
