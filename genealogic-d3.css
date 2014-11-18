@@ -1,0 +1,27 @@
+circle.leaf {
+  fill-opacity: .5;
+  stroke-width: 1px;
+}
+path.branch {
+  fill: none;
+  stroke-width: 1.5px;
+  stroke-dasharray: 5, 5;
+  stroke-opacity: .5;
+}
+text.leaf {
+  font: 11px sans-serif;
+  text-anchor: middle;
+}
+text.leaf.caption {
+  font: 9px sans-serif;
+  font-style: italic;
+}
+svg#miniature {
+  position: fixed;
+  top: 10%;
+  right: 10%';
+}
+circle.miniature.filled_with_img {
+  stroke: black;
+  stroke-width: 2px;
+}

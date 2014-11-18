@@ -1,0 +1,50 @@
+{
+  "name": "Shmi Skywalker",
+  "partner": {
+    "name": "Cliegg Lars"
+  },
+  "children": [
+    {
+      "name": "Anakin Skywalker",
+      "caption": "Darth Vader",
+      "partner": {
+        "name": "Padmé Amidala",
+        "caption": "Queen of Naboo"
+      },
+      "children": [
+        {
+          "name": "Luke Skywalker",
+          "partner": {
+            "name": "Mara Jade",
+            "caption": "Emperor's Hand"
+          },
+          "children": [
+            {
+              "name": "Ben Skywalker"
+            }
+          ]
+        },
+        {
+          "name": "Leïa Organa",
+          "caption": "Senator of Alderaan",
+          "partner": {
+            "name": "Han Solo"
+          },
+          "children": [
+            {
+              "name": "Jaina Fel"
+            },
+            {
+              "name": "Jacen Solo",
+              "caption": "Darth Caedus"
+            },
+            {
+              "name": "Anakin Solo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
