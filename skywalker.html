@@ -9,7 +9,7 @@
     <img style='position: absolute; top: 0; right: 0; border: 0;' src='https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>
 </a>
 <div>
-    packing_generation_factor: <input id=packing_generation_factor type=number step=any min=3 value=5>
+    packing_generation_factor: <input id=packing_generation_factor type=number step=any min=3.1 value=5>
     <br>
     use_fixed_miniature: <input id=use_fixed_miniature type=checkbox>
     miniature_photo_size: <input id=miniature_photo_size type=number value=300 disabled=disabled>
@@ -33,9 +33,9 @@ var redisplay = function () {
     genealogic.generate({
         json_input_genealogy: 'skywalker_genealogy.json',
         path_to_miniature_imgs: 'miniatures_skywalker/',
-        packing_generation_factor: document.getElementById('packing_generation_factor').value,
+        packing_generation_factor: +document.getElementById('packing_generation_factor').value,
         use_fixed_miniature: document.getElementById('use_fixed_miniature').checked,
-        miniature_photo_size: document.getElementById('miniature_photo_size').value,
+        miniature_photo_size: +document.getElementById('miniature_photo_size').value,
         d3_color_scale: document.getElementById('d3_color_scale').value,
         post_rendering_callback: function () { 
             d3.selectAll('svg#genealogic circle').on('click', function () {

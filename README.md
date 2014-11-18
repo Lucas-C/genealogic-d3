@@ -69,9 +69,9 @@ https://github.com/Lucas-C/genealogic-d3/blob/master/genealogic-d3.js#L93
 This visualization tool can be combined with an 'upload-and-crop-your-own-picture' plugin,
 to let members of the family upload their photos themselves. E.g. :
 
-    * https://github.com/acornejo/jquery-cropbox
-    * https://github.com/TuyoshiVinicius/jQuery-Picture-Cut
-    * https://github.com/andyvr/picEdit
+- https://github.com/acornejo/jquery-cropbox
+- https://github.com/TuyoshiVinicius/jQuery-Picture-Cut
+- https://github.com/andyvr/picEdit
 
 ## License
 Tl;dr plain English version: https://tldrlegal.com/license/adaptive-public-license-1.0-%28apl-1.0%29

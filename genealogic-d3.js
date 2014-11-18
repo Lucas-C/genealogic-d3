@@ -1,6 +1,30 @@
-var genealogic = (function () {
+var genealogic = (function () { /* exported genealogic */
     'use strict';
-    var string_to_valid_id = function (str) { // Removes any non-letter/digit/- character
+    var CONFIG_DEFAULTS = {
+        main_svg_width: 800,
+        main_svg_height: 800,
+        main_svg_html_anchor_selector: 'body',
+        json_input_genealogy: 'genealogy.json',
+        path_to_miniature_imgs: false, // if evaluates to false, only use optional .miniature_img_url
+        miniature_img_ext: '.jpg',
+        use_fixed_miniature: true,
+        miniature_svg_html_anchor_selector: 'body',
+        miniature_photo_size: 300,
+        packing_generation_factor: null, // default value is set later on as $genealogy_max_depth - 0.5
+        d3_color_scale: 'category20',
+        leaf_name_dy: '0.3em',
+        leaf_caption_dy: '1.8em',
+        post_rendering_callback: false,
+    },
+    extend = function (extended, update) {
+        for (var key in update) {
+            if (update.hasOwnProperty(key)) {
+                extended[key] = update[key];
+            }
+        }
+        return (arguments[2] ? extend.apply(extended, [].slice.call(arguments, 1)) : extended);
+    },
+    string_to_valid_id = function (str) { // Removes any non-letter/digit/- character
         return str.replace(/[^a-zA-Z0-9-]/g, '');
     },
     load_img_patterns = function (node, path_to_imgs, img_ext, defs) {
@@ -73,7 +97,7 @@ var genealogic = (function () {
             var child_node = node.children[j];
             if (child_node === node_itself) { continue; }
             out_links.push({source: node_itself, target: child_node.itself || child_node});
-            out_links.push.apply(out_links, convert_to_links(child_node));
+            [].push.apply(out_links, convert_to_links(child_node));
         }
         return out_links;
     },
@@ -96,53 +120,39 @@ var genealogic = (function () {
         miniature_node.attr('style', d.default_style).attr('class', d.default_class);
     },
     generate = function (args) {
-        args = args || {};
-        var main_svg_width = +args.main_svg_width || 800,
-            main_svg_height = +args.main_svg_height || 800,
-            main_svg_html_anchor_selector = args.main_svg_html_anchor_selector || 'body',
-            json_input_genealogy = args.json_input_genealogy || 'genealogy.json',
-            path_to_miniature_imgs = args.path_to_miniature_imgs, // if evaluate to false, only use optional .miniature_img_url
-            miniature_img_ext = args.miniature_img_ext || '.jpg',
-            use_fixed_miniature = !!(typeof args.use_fixed_miniature !== 'undefined' ? args.use_fixed_miniature : true),
-            miniature_svg_html_anchor_selector = args.miniature_svg_html_anchor_selector || 'body',
-            miniature_photo_size = +args.miniature_photo_size || 300,
-            packing_generation_factor = +args.packing_generation_factor, // default value is set later on as $genealogy_max_depth - 0.5
-            d3_color_scale = args.d3_color_scale || 'category20',
-            leaf_name_dy = args.leaf_text_dy || '0.3em',
-            leaf_caption_dy = args.leaf_text_dy || '1.8em',
-            post_rendering_callback = args.post_rendering_callback,
-            fill = d3.scale[d3_color_scale](),
-            svg = d3.select(main_svg_html_anchor_selector).append('svg')
+        var conf = extend({}, CONFIG_DEFAULTS, args),
+            fill = d3.scale[conf.d3_color_scale](),
+            svg = d3.select(conf.main_svg_html_anchor_selector).append('svg')
                 .attr('id', 'genealogic')
-                .attr('width', main_svg_width)
-                .attr('height', main_svg_height);
+                .attr('width', conf.main_svg_width)
+                .attr('height', conf.main_svg_height);
 
-        if (use_fixed_miniature) {
-            d3.select(miniature_svg_html_anchor_selector).append('svg')
+        if (conf.use_fixed_miniature) {
+            d3.select(conf.miniature_svg_html_anchor_selector).append('svg')
                 .attr('id', 'miniature')
-                .attr('width', miniature_photo_size + 4)
-                .attr('height', miniature_photo_size + 4)
+                .attr('width', conf.miniature_photo_size + 4)
+                .attr('height', conf.miniature_photo_size + 4)
                 .append('svg:circle')
                     .attr('class', 'miniature')
-                    .attr('cx', miniature_photo_size / 2 + 2)
-                    .attr('cy', miniature_photo_size / 2 + 2)
-                    .attr('r', miniature_photo_size / 2)
+                    .attr('cx', conf.miniature_photo_size / 2 + 2)
+                    .attr('cy', conf.miniature_photo_size / 2 + 2)
+                    .attr('r', conf.miniature_photo_size / 2)
                     .attr('style', 'fill-opacity: 0');
         }
 
         var display_genealogy = function (json) {
-            load_img_patterns(json, path_to_miniature_imgs, miniature_img_ext);
+            load_img_patterns(json, conf.path_to_miniature_imgs, conf.miniature_img_ext);
             pre_process_nodes(json);
 
             var max_tree_depth = get_max_depth(json);
-            if (!packing_generation_factor || packing_generation_factor <= max_tree_depth - 1) {
-                packing_generation_factor = max_tree_depth - 0.5;
+            if (!conf.packing_generation_factor || conf.packing_generation_factor <= max_tree_depth - 1) {
+                conf.packing_generation_factor = max_tree_depth - 0.5;
             }
 
             var links = convert_to_links(json),
                 pack = d3.layout.pack()
-                    .size([main_svg_width, main_svg_height])
-                    .value(function(d) { return packing_generation_factor - d.generation; }),
+                    .size([conf.main_svg_width, conf.main_svg_height])
+                    .value(function(d) { return conf.packing_generation_factor - d.generation; }),
                 node = svg.datum(json).selectAll('.node')
                     .data(pack.nodes).enter()
                     .append('svg:g')
@@ -151,12 +161,12 @@ var genealogic = (function () {
 
             leaf.append('svg:text')
                 .attr('class', 'leaf name')
-                .attr('dy', leaf_name_dy)
+                .attr('dy', conf.leaf_name_dy)
                 // Ugly homonyms handling: 'name' can contain digits to distinguish people, which are stripped below
                 .text(function(d) { return d.name.replace(/[0-9]/g, ''); });
             leaf.filter(function(d) { return d.caption; }).append('svg:text')
                 .attr('class', 'leaf caption')
-                .attr('dy', leaf_caption_dy)
+                .attr('dy', conf.leaf_caption_dy)
                 .text(function(d) { return d.caption; });
             leaf.append('svg:circle')
                 .attr('class', 'leaf')
@@ -164,10 +174,10 @@ var genealogic = (function () {
                 .style('fill', function(d) { return fill(d.generation + (d.by_alliance_with ? 0.5 : 0)); })
                 .style('stroke', function(d) { return d3.rgb(fill(d.generation + (d.by_alliance_with ? 0.5 : 0))).darker(); })
                 .on('mouseover', function (d) {
-                    miniature_mouseover(d, (use_fixed_miniature ? d3.select('svg#miniature circle') : d3.select(this)));
+                    miniature_mouseover(d, (conf.use_fixed_miniature ? d3.select('svg#miniature circle') : d3.select(this)));
                 })
                 .on('mouseout', function (d) {
-                    miniature_mouseout(d, (use_fixed_miniature ? d3.select('svg#miniature circle') : d3.select(this)));
+                    miniature_mouseout(d, (conf.use_fixed_miniature ? d3.select('svg#miniature circle') : d3.select(this)));
                 });
 
             svg.selectAll('line').data(links)
@@ -176,17 +186,17 @@ var genealogic = (function () {
                 .style('stroke', function(d) { return d3.rgb(fill(d.target.by_alliance_with + 1)).darker(); })
                 .attr('d', linkArc);
 
-            if (post_rendering_callback) {
-                post_rendering_callback();
+            if (conf.post_rendering_callback) {
+                conf.post_rendering_callback();
             }
         };
 
-        if (typeof json_input_genealogy === 'string') {
-            d3.json(json_input_genealogy, function(json) {
+        if (typeof conf.json_input_genealogy === 'string') {
+            d3.json(conf.json_input_genealogy, function(json) {
                 display_genealogy(json);
             });
         } else {
-            display_genealogy(json_input_genealogy);
+            display_genealogy(conf.json_input_genealogy);
         }
     },
     remove = function (args) {
