@@ -1,27 +1,18 @@
 # genealogic-d3
 
-[KISS](http://en.wikipedia.org/wiki/KISS_principle) genealogy tree visualization using [d3.js](http://d3js.org) only.
+[KISS](http://en.wikipedia.org/wiki/KISS_principle) genealogy tree visualization depending on [d3.js](http://d3js.org) only.
 
 ## Demo
 https://chezsoi.org/lucas/genealogic-d3/skywalker.html
 
-## HTML usage example
+## Installation
+This tool can only display tree-like genealogies, e.g. all nodes are descendants of one given ancestor, like in a pedigree tree.
+It won't be able to render generic genealogy graphs with non-unique root ancestor.
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.js"></script>
-    <script type="text/javascript" src="genealogic-d3.js"></script>
-    <script type="text/javascript">
-    genealogic.generate({
-        json_input_genealogy: 'skywalker_genealogy.json',
-        path_to_miniature_imgs: 'miniatures_skywalker/'
-        use_fixed_miniature: false,
-    });
+A basic setup requires only to put 3 files in a directory, and you'll be able to view the result locally with a browser:
 
-## Requirements
-This tool is only adequate to display tree-like genealogies, e.g. all nodes are descendants of one given ancestor, like in a pedigree tree.
-It can not display generic genealogy graphs with non-unique root ancestor.
-
-A basic setup requires only two things:
-
+- _genealogic-d3.js_
+- an HTML file (cf. [index.html template](#index.html_template))
 - a JSON 'genealogy' file, describing a descendants tree
 - optionally, a subdirectory containing miniatures *.jpg* images, named after the genealogy nodes *.name* attributes.
 
@@ -43,10 +34,19 @@ JSON genealogy structure :
 
 You can check the _skywalker\_genealogy.json_ for a complete example. 
 
-## Needed dependencies
-[d3.js](http://d3js.org) only.
+### index.html template
+For the needs of the demo, _skywalker.html_ is a bit verbose. There is a basic HTML file skeleton to use `genealogic.d3` :
 
-## Parameters
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.js"></script>
+    <script type="text/javascript" src="genealogic-d3.js"></script>
+    <script type="text/javascript">
+    genealogic.generate({
+        json_input_genealogy: 'genealogy.json',
+        path_to_miniature_imgs: 'miniatures_dir/'
+        use_fixed_miniature: false, // Default to false
+    });
+
+### Parameters
 
 - *main_svg_width* : main <svg> window width in pixels
 - *main_svg_height* : main <svg> window height in pixels
@@ -63,7 +63,7 @@ with high values meaning that all circles will be the same size
 - *post_rendering_callback* : if defined, this function will be executed once d3.js rendering over
 
 The list of all those parameters default values can be found in the source code here:
-https://github.com/Lucas-C/genealogic-d3/blob/master/genealogic-d3.js#L93
+https://github.com/Lucas-C/genealogic-d3/blob/master/genealogic-d3.js#L3
 
 ## Notes
 This visualization tool can be combined with an 'upload-and-crop-your-own-picture' plugin,
