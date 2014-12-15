@@ -12,7 +12,7 @@ It won't be able to render generic genealogy graphs with non-unique root ancesto
 A basic setup requires only to put 3 files in a directory, and you'll be able to view the result locally with a browser:
 
 - _genealogic-d3.js_
-- an HTML file (cf. [index.html template](#index.html_template))
+- an HTML file (cf. [index.html template](#indexhtml-template))
 - a JSON 'genealogy' file, describing a descendants tree
 - optionally, a subdirectory containing miniatures *.jpg* images, named after the genealogy nodes *.name* attributes.
 
@@ -39,28 +39,29 @@ For the needs of the demo, _skywalker.html_ is a bit verbose. There is a basic H
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.js"></script>
     <script type="text/javascript" src="genealogic-d3.js"></script>
+    <svg width="1000" height="1000" id="genealogic-tree"/>
+    <svg id="genealogic-miniature"/>
     <script type="text/javascript">
     genealogic.generate({
-        json_input_genealogy: 'genealogy.json',
+        json_input_genealogy: 'my-family-genealogy.json',
         path_to_miniature_imgs: 'miniatures_dir/'
-        use_fixed_miniature: false, // Default to false
+        use_fixed_miniature: false, // Defaults to true
     });
 
 ### Parameters
 
-- *main_svg_width* : main <svg> window width in pixels
-- *main_svg_height* : main <svg> window height in pixels
-- *main_svg_html_anchor_selector* : CSS selector to the HTML element where the main <svg> window will be created
-- *json_input_genealogy* : URI to the JSON genealogy file, or a javascript genealogy dictionary
-- *path_to_miniature_imgs* : miniatures images directory URI. If this evaluate to false, only miniatures specified through the optional _.miniature_img_url_ attribute will be used.
-- *miniature_img_ext* : the miniatures image files extension
-- *use_fixed_miniature* : whether to use a unique floating circle to viusalize miniatures, or else embed them inside each node circle
-- *miniature_svg_html_anchor_selector* : CSS selector to the HTML element where the miniature <svg> window will be created
-- *miniature_photo_size* : in pixels
-- *packing_generation_factor* : control the differences in sizes of the node circles: it must always be higher than the tree max depth,
+- **svg_tree_selector** : CSS selector to the main <svg> HTML element where the tree will be inserted.
+- **json_input_genealogy** : URI to the JSON genealogy file, or a javascript genealogy dictionary
+- **path_to_miniature_imgs** : miniatures images directory URI. If this evaluate to false, only miniatures specified through the optional _.miniature_img_url_ attribute will be used.
+- **miniature_img_ext** : the miniatures image files extension
+- **use_fixed_miniature** : whether to use a unique floating circle to viusalize miniatures, or else embed them inside each node circle
+- **miniature_svg_selector** : CSS selector to the <svg> HTML element that will be used as the miniature "window".
+- **miniature_photo_size** : in pixels
+- **packing_generation_factor** : control the differences in sizes of the node circles: it must always be higher than the tree max depth,
 with high values meaning that all circles will be the same size
-- *d3_color_scale* : cf. https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
-- *post_rendering_callback* : if defined, this function will be executed once d3.js rendering over
+- **d3_color_scale** : cf. https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
+- **wrapped_text_line_height_ems** : spacing in ems between names / captions multiple lines when text needs to be wrapped
+- **post_rendering_callback** : if defined, this function will be executed once d3.js rendering over
 
 The list of all those parameters default values can be found in the source code here:
 https://github.com/Lucas-C/genealogic-d3/blob/master/genealogic-d3.js#L3
@@ -72,6 +73,10 @@ to let members of the family upload their photos themselves. E.g. :
 - https://github.com/acornejo/jquery-cropbox
 - https://github.com/TuyoshiVinicius/jQuery-Picture-Cut
 - https://github.com/andyvr/picEdit
+
+Also, this is a useful command to list missing miniatures:
+
+    diff <(jq -r '..|objects|.name' genealogy.json | sort) <(ls miniatures | sed 's/\..*//' | sort)
 
 ## License
 Tl;dr plain English version: https://tldrlegal.com/license/adaptive-public-license-1.0-%28apl-1.0%29

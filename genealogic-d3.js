@@ -1,19 +1,18 @@
 var genealogic = (function () { /* exported genealogic */
     'use strict';
     var CONFIG_DEFAULTS = Object.freeze({
-        main_svg_width: 800,
-        main_svg_height: 800,
-        main_svg_html_anchor_selector: 'body',
+        svg_tree_selector: 'svg#genealogic-tree',
         json_input_genealogy: 'genealogy.json',
         path_to_miniature_imgs: false, // if evaluates to false, only use optional .miniature_img_url
         miniature_img_ext: '.jpg',
         use_fixed_miniature: true,
-        miniature_svg_html_anchor_selector: 'body',
+        svg_miniature_selector: 'svg#genealogic-miniature',
         miniature_photo_size: 300,
         packing_generation_factor: null, // default value is set later on as $genealogy_max_depth - 0.5
         d3_color_scale: 'category20',
         leaf_name_dy: '0.3em',
-        leaf_caption_dy: '1.8em',
+        leaf_caption_dy: '3em',
+        wrapped_text_line_height_ems: 1.5,
         post_rendering_callback: false,
     }),
     extend = function () { // jQuery.extend equivalent
@@ -29,20 +28,19 @@ var genealogic = (function () { /* exported genealogic */
     string_to_valid_id = function (str) { // Removes any non-letter/digit/- character
         return str.replace(/[^a-zA-Z0-9-]/g, '');
     },
-    load_img_patterns = function (node, path_to_imgs, img_ext, defs) {
-        defs = defs || d3.select('svg#genealogic').append('svg:defs');
-        add_img_pattern(defs, node, path_to_imgs, img_ext);
+    load_img_patterns = function (svg_defs, node, path_to_imgs, img_ext) {
+        add_img_pattern(svg_defs, node, path_to_imgs, img_ext);
         if (node.partner) {
-            add_img_pattern(defs, node.partner, path_to_imgs, img_ext);
+            add_img_pattern(svg_defs, node.partner, path_to_imgs, img_ext);
         }
         for (var i = 0; i < (node.children ? node.children.length : 0); i++) {
-            load_img_patterns(node.children[i], path_to_imgs, img_ext, defs);
+            load_img_patterns(svg_defs, node.children[i], path_to_imgs, img_ext);
         }
     },
-    add_img_pattern = function (defs, node, path_to_imgs, img_ext) {
+    add_img_pattern = function (svg_defs, node, path_to_imgs, img_ext) {
         var image_url = (path_to_imgs ? path_to_imgs + encodeURI(node.name) + img_ext : node.miniature_img_url);
         if (image_url) {
-            defs.append('svg:pattern')
+            svg_defs.append('svg:pattern')
                 .attr('id', string_to_valid_id(node.name))
                 .attr('patternContentUnits', 'objectBoundingBox')
                 .attr('height', '100%')
@@ -121,17 +119,57 @@ var genealogic = (function () { /* exported genealogic */
     miniature_mouseout = function (d, miniature_node) {
         miniature_node.attr('style', d.default_style).attr('class', d.default_class);
     },
+    wrap_text = function (selection, content_key, line_height, strip_nonalpha) { // Inspired by http://bl.ocks.org/mbostock/7555321
+        selection.each(function(d) {
+            var text_node = d3.select(this),
+                content = d[content_key];
+            if (strip_nonalpha) {
+                content = content.replace(/[0-9]/g, '');
+            }
+            var words = content.split(/\s+/);
+            if (words.length === 1) {
+                text_node.text(content);
+                return;
+            }
+            var width = d.r * 2,
+                line = [],
+                line_number = 0,
+                tspan = text_node.append('tspan').attr('x', 0).attr('y', 0),
+                tspans = [tspan];
+            for (var i = 0; i < words.length; i++) {
+                var word = words[i];
+                line.push(word);
+                tspan.text(line.join(' '));
+                if (line.length > 1 && tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(' '));
+                    line = [word];
+                    tspan = text_node.append('tspan').attr('x', 0).attr('y', 0).text(word);
+                    tspans.push(tspan);
+                }
+            }
+            var dy = parseFloat(text_node.attr('dy')) - line_height * (tspans.length - 1) / 2;
+            for (line_number = 0; line_number < tspans.length; line_number++) {
+                tspan = tspans[line_number];
+                tspan.attr('dy', dy + 'em');
+                dy += line_height;
+            }
+        });
+    },
+    check_exists = function (selector) {
+        if (d3.select(selector).empty()) {
+            throw new Error('No svg element found for selector: ' + selector);
+        }
+    },
     generate = function (args) {
         var conf = extend({}, CONFIG_DEFAULTS, args),
             fill = d3.scale[conf.d3_color_scale](),
-            svg = d3.select(conf.main_svg_html_anchor_selector).append('svg')
-                .attr('id', 'genealogic')
-                .attr('width', conf.main_svg_width)
-                .attr('height', conf.main_svg_height);
+            svg = d3.select(conf.svg_tree_selector);
+        check_exists(conf.svg_tree_selector);
 
         if (conf.use_fixed_miniature) {
-            d3.select(conf.miniature_svg_html_anchor_selector).append('svg')
-                .attr('id', 'miniature')
+            check_exists(conf.svg_miniature_selector);
+            d3.select(conf.svg_miniature_selector)
                 .attr('width', conf.miniature_photo_size + 4)
                 .attr('height', conf.miniature_photo_size + 4)
                 .append('svg:circle')
@@ -143,7 +181,11 @@ var genealogic = (function () { /* exported genealogic */
         }
 
         var display_genealogy = function (json) {
-            load_img_patterns(json, conf.path_to_miniature_imgs, conf.miniature_img_ext);
+            var svg_defs = d3.select(conf.svg_tree_selector).select('defs');
+            if (svg_defs.empty()) {
+                svg_defs = d3.select(conf.svg_tree_selector).append('svg:defs');
+                load_img_patterns(svg_defs, json, conf.path_to_miniature_imgs, conf.miniature_img_ext);
+            }
             pre_process_nodes(json);
 
             var max_tree_depth = get_max_depth(json);
@@ -153,7 +195,7 @@ var genealogic = (function () { /* exported genealogic */
 
             var links = convert_to_links(json),
                 pack = d3.layout.pack()
-                    .size([conf.main_svg_width, conf.main_svg_height])
+                    .size([svg.attr('width'), svg.attr('height')])
                     .value(function(d) { return conf.packing_generation_factor - d.generation; }),
                 node = svg.datum(json).selectAll('.node')
                     .data(pack.nodes).enter()
@@ -165,21 +207,21 @@ var genealogic = (function () { /* exported genealogic */
                 .attr('class', 'leaf name')
                 .attr('dy', conf.leaf_name_dy)
                 // Ugly homonyms handling: 'name' can contain digits to distinguish people, which are stripped below
-                .text(function(d) { return d.name.replace(/[0-9]/g, ''); });
+                .call(wrap_text, 'name', conf.wrapped_text_line_height_ems, true);
             leaf.filter(function(d) { return d.caption; }).append('svg:text')
                 .attr('class', 'leaf caption')
                 .attr('dy', conf.leaf_caption_dy)
-                .text(function(d) { return d.caption; });
+                .call(wrap_text, 'caption', conf.wrapped_text_line_height_ems);
             leaf.append('svg:circle')
                 .attr('class', 'leaf')
                 .attr('r', function(d) { return d.r; })
                 .style('fill', function(d) { return fill(d.generation + (d.by_alliance_with ? 0.5 : 0)); })
                 .style('stroke', function(d) { return d3.rgb(fill(d.generation + (d.by_alliance_with ? 0.5 : 0))).darker(); })
                 .on('mouseover', function (d) {
-                    miniature_mouseover(d, (conf.use_fixed_miniature ? d3.select('svg#miniature circle') : d3.select(this)));
+                    miniature_mouseover(d, (conf.use_fixed_miniature ? d3.select(conf.svg_miniature_selector).select('circle') : d3.select(this)));
                 })
                 .on('mouseout', function (d) {
-                    miniature_mouseout(d, (conf.use_fixed_miniature ? d3.select('svg#miniature circle') : d3.select(this)));
+                    miniature_mouseout(d, (conf.use_fixed_miniature ? d3.select(conf.svg_miniature_selector).select('circle') : d3.select(this)));
                 });
 
             svg.selectAll('line').data(links)
@@ -203,8 +245,11 @@ var genealogic = (function () { /* exported genealogic */
     },
     remove = function (args) {
         var conf = extend({}, CONFIG_DEFAULTS, args);
-        d3.select(conf.main_svg_html_anchor_selector).select('svg#genealogic').remove();
-        d3.select(conf.miniature_svg_html_anchor_selector).select('svg#miniature').remove();
+        check_exists(conf.svg_tree_selector);
+        d3.select(conf.svg_tree_selector).selectAll('g').remove();
+        d3.select(conf.svg_tree_selector).selectAll('path').remove();
+        check_exists(conf.svg_miniature_selector);
+        d3.select(conf.svg_miniature_selector).selectAll('*').remove();
     };
     return {
         generate: generate,
