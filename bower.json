@@ -1,0 +1,14 @@
+{
+  "name": "famille_cesbron",
+  "authors": [
+    "Lucas Cimon"
+  ],
+  "private": true,
+  "dependencies": {
+    "angular": "1.4.8",
+    "angular-translate": "2.7.2",
+    "d3": "3.4.13",
+    "flex-calendar": "100a81b83e0b84c39339afabd828c233d9854fb6",
+    "moment-ferie-fr": "8ca51b6bab35747b48a0a526d7b858c22a5b4cb6"
+  }
+}

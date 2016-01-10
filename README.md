@@ -34,11 +34,16 @@ JSON genealogy structure :
 
 You can check the _skywalker\_genealogy.json_ for a complete example. 
 
+### Generating the JS & CSS bundles
+
+The bundles also include the JS & CSS code for the birthday calendar:
+
+    ./generate-genealogy-css.sh miniatures_skywalker && gulp
+
 ### index.html template
 For the needs of the demo, _skywalker.html_ is a bit verbose. There is a basic HTML file skeleton to use `genealogic.d3` :
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.js"></script>
-    <script type="text/javascript" src="genealogic-d3.js"></script>
+    <script type="text/javascript" src="bundle.js"></script>
     <svg width="1000" height="1000" id="genealogic-tree"/>
     <svg id="genealogic-miniature"/>
     <script type="text/javascript">
@@ -60,7 +65,7 @@ For the needs of the demo, _skywalker.html_ is a bit verbose. There is a basic H
 - **packing_generation_factor** : control the differences in sizes of the node circles: it must always be higher than the tree max depth,
 with high values meaning that all circles will be the same size
 - **d3_color_scale** : cf. https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
-- **wrapped_text_line_height_ems** : spacing in ems between names / captions multiple lines when text needs to be wrapped
+- **wrapped_text_line_height_ems** : spacing in _ems_ between names / captions multiple lines when text needs to be wrapped
 - **post_rendering_callback** : if defined, this function will be executed once d3.js rendering over
 
 The list of all those parameters default values can be found in the source code here:
@@ -70,6 +75,7 @@ https://github.com/Lucas-C/genealogic-d3/blob/master/genealogic-d3.js#L3
 This visualization tool can be combined with an 'upload-and-crop-your-own-picture' plugin,
 to let members of the family upload their photos themselves. E.g. :
 
+- https://www.filepicker.io
 - https://github.com/acornejo/jquery-cropbox
 - https://github.com/TuyoshiVinicius/jQuery-Picture-Cut
 - https://github.com/andyvr/picEdit

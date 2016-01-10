@@ -1,0 +1,10 @@
+{
+  "name": "famille_cesbron",
+  "author": "Lucas Cimon",
+  "moduleType": "globals",
+  "devDependencies": {
+    "gulp": "3.9.0",
+    "gulp-concat": "2.6.0",
+    "minimist": "1.2.0"
+  }
+}

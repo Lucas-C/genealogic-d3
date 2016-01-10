@@ -1,8 +1,9 @@
-var genealogic = (function () { /* exported genealogic */
+genealogic_d3 = (function () {
     'use strict';
     var CONFIG_DEFAULTS = Object.freeze({
         svg_tree_selector: 'svg#genealogic-tree',
-        json_input_genealogy: 'genealogy.json',
+        json_genealogy: 'genealogy.json', // can be either an URL to a JSON file or a full JSON object
+        merge_root_partners: false,
         path_to_miniature_imgs: false, // if evaluates to false, only use optional .miniature_img_url
         miniature_img_ext: '.jpg',
         use_fixed_miniature: true,
@@ -25,8 +26,14 @@ var genealogic = (function () { /* exported genealogic */
         }
         return arguments[0];
     },
-    string_to_valid_id = function (str) { // Removes any non-letter/digit/- character
-        return str.replace(/[^a-zA-Z0-9-]/g, '');
+    name_to_valid_id = function (name) { // Removes any non-letter/digit/- character
+        return name.replace(/[^a-zA-Z0-9-]/g, '');
+    },
+    name_to_filename = function (name) { // We allow spaces in the displayed text, but not in the filenames
+        return encodeURI(name.replace(/ /g, ''));
+    },
+    name_to_displayed_text = function (name) { // Ugly homonyms handling: 'name' can contain digits to distinguish people, which are stripped below
+        return name.replace(/[0-9]/g, '');
     },
     load_img_patterns = function (svg_defs, node, path_to_imgs, img_ext) {
         add_img_pattern(svg_defs, node, path_to_imgs, img_ext);
@@ -38,10 +45,10 @@ var genealogic = (function () { /* exported genealogic */
         }
     },
     add_img_pattern = function (svg_defs, node, path_to_imgs, img_ext) {
-        var image_url = (path_to_imgs ? path_to_imgs + encodeURI(node.name) + img_ext : node.miniature_img_url);
+        var image_url = (path_to_imgs ? path_to_imgs + name_to_filename(node.name) + img_ext : node.miniature_img_url);
         if (image_url) {
             svg_defs.append('svg:pattern')
-                .attr('id', string_to_valid_id(node.name))
+                .attr('id', name_to_valid_id(node.name))
                 .attr('patternContentUnits', 'objectBoundingBox')
                 .attr('height', '100%')
                 .attr('width', '100%')
@@ -108,7 +115,7 @@ var genealogic = (function () { /* exported genealogic */
         return 'M' + d.source.x + ',' + d.source.y + 'A' + dr + ',' + dr + ' 0 0,1 ' + d.target.x + ',' + d.target.y;
     },
     miniature_mouseover = function (d, miniature_node) {
-        var img_id = string_to_valid_id(d.name);
+        var img_id = name_to_valid_id(d.name);
         d.default_style = miniature_node.attr('style');
         d.default_class = miniature_node.attr('class');
         if (is_img_pattern_loaded(img_id)) {
@@ -119,14 +126,11 @@ var genealogic = (function () { /* exported genealogic */
     miniature_mouseout = function (d, miniature_node) {
         miniature_node.attr('style', d.default_style).attr('class', d.default_class);
     },
-    wrap_text = function (selection, content_key, line_height, strip_nonalpha) { // Inspired by http://bl.ocks.org/mbostock/7555321
+    wrap_text = function (selection, content_key, line_height, content_filter) { // Inspired by http://bl.ocks.org/mbostock/7555321
         selection.each(function(d) {
             var text_node = d3.select(this),
-                content = d[content_key];
-            if (strip_nonalpha) {
-                content = content.replace(/[0-9]/g, '');
-            }
-            var words = content.split(/\s+/);
+                content = (content_filter ? content_filter(d[content_key]) : d[content_key]),
+                words = content.split(/\s+/);
             if (words.length === 1) {
                 text_node.text(content);
                 return;
@@ -181,6 +185,11 @@ var genealogic = (function () { /* exported genealogic */
         }
 
         var display_genealogy = function (json) {
+            if (conf.merge_root_partners && json.partner) {
+                json.name = json.name + ' & ' + json.partner.name;
+                delete json.partner;
+            }
+
             var svg_defs = d3.select(conf.svg_tree_selector).select('defs');
             if (svg_defs.empty()) {
                 svg_defs = d3.select(conf.svg_tree_selector).append('svg:defs');
@@ -206,8 +215,7 @@ var genealogic = (function () { /* exported genealogic */
             leaf.append('svg:text')
                 .attr('class', 'leaf name')
                 .attr('dy', conf.leaf_name_dy)
-                // Ugly homonyms handling: 'name' can contain digits to distinguish people, which are stripped below
-                .call(wrap_text, 'name', conf.wrapped_text_line_height_ems, true);
+                .call(wrap_text, 'name', conf.wrapped_text_line_height_ems, name_to_displayed_text);
             leaf.filter(function(d) { return d.caption; }).append('svg:text')
                 .attr('class', 'leaf caption')
                 .attr('dy', conf.leaf_caption_dy)
@@ -217,6 +225,7 @@ var genealogic = (function () { /* exported genealogic */
                 .attr('r', function(d) { return d.r; })
                 .style('fill', function(d) { return fill(d.generation + (d.by_alliance_with ? 0.5 : 0)); })
                 .style('stroke', function(d) { return d3.rgb(fill(d.generation + (d.by_alliance_with ? 0.5 : 0))).darker(); })
+                .attr('title', function(d) { return d.birthdate; })
                 .on('mouseover', function (d) {
                     miniature_mouseover(d, (conf.use_fixed_miniature ? d3.select(conf.svg_miniature_selector).select('circle') : d3.select(this)));
                 })
@@ -235,12 +244,12 @@ var genealogic = (function () { /* exported genealogic */
             }
         };
 
-        if (typeof conf.json_input_genealogy === 'string') {
-            d3.json(conf.json_input_genealogy, function(json) {
+        if (typeof conf.json_genealogy === 'string') {
+            d3.json(conf.json_genealogy, function(json) {
                 display_genealogy(json);
             });
         } else {
-            display_genealogy(conf.json_input_genealogy);
+            display_genealogy(conf.json_genealogy);
         }
     },
     remove = function (args) {

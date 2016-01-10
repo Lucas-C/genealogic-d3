@@ -1,0 +1,40 @@
+.calendarContainer {
+	margin: auto;
+	max-width: 49rem;
+}
+.flex-calendar .days .day {
+	line-height: 6.5rem;
+	height: 6.5rem;
+}
+.flex-calendar .days .day.event::before {
+	width: 0;
+	height: 0;
+}
+.flex-calendar .days .day.event .number {
+	width: 6.5rem;
+	height: 6.5rem;
+	margin: auto;
+	line-height: 2rem;
+	border-radius: 100%;
+	color:  rgba(0, 0, 0, 0);
+	background-size: contain;
+}
+.flex-calendar .days .day.event .number:after {
+	display: block;
+	color: white;
+	text-shadow: 1px 1px black;
+}
+.birthdays-2 .number {
+	background-color: #0071FF;
+}
+.birthdays-2 .number:after {
+	content: '2';
+	font-size: 3rem;
+}
+.birthdays-3 .number {
+	background-color: #0071FF;
+}
+.birthdays-3 .number:after {
+	content: '3';
+	font-size: 3rem;
+}

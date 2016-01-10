@@ -3,11 +3,11 @@
   <head>
     <meta charset='UTF-8'>
     <title>Small genealogical tree of the Skywalker family</title>
-    <link rel='stylesheet' href='genealogic-d3.css'>
+    <meta name="author" content="Lucas Cimon [ chezsoi.org/lucas ]"/>
+    <link rel='stylesheet' href='bundle.css'>
   </head>
-  <body>
-    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.js'></script>
-    <script type='text/javascript' src='genealogic-d3.js'></script>
+  <body ng-app="BirthdayCalendar">
+    <script type='text/javascript' src='bundle.js'></script>
     <h3 style='text-align:center'>Skywalker family</h3>
     <a href='https://github.com/Lucas-C/genealogic-d3'>
         <img style='position: absolute; top: 0; right: 0; border: 0;' src='https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>
@@ -29,15 +29,19 @@
     </div>
     <svg width="800" height="800" id="genealogic-tree"/>
     <svg id="genealogic-miniature"/>
+    <div ng-if="options && events" class="calendarContainer">
+      <flex-calendar options="options" events="events"></flex-calendar>
+    </div>
     <script type='text/javascript'>
+      birthday_calendar('skywalker_genealogy.json');
       document.getElementById('use_fixed_miniature').onchange = function () {
         document.getElementById('miniature_photo_size').disabled = (this.checked ? '' : 'disabled');
       }
       var cycle_remover = function (key, value) { if (key === 'parent') return '<[parent]>'; return value; };
       var redisplay = function () {
-        genealogic.remove();
-        genealogic.generate({
-          json_input_genealogy: 'skywalker_genealogy.json',
+        genealogic_d3.remove();
+        genealogic_d3.generate({
+          json_genealogy: 'skywalker_genealogy.json',
           path_to_miniature_imgs: 'miniatures_skywalker/',
           packing_generation_factor: +document.getElementById('packing_generation_factor').value,
           use_fixed_miniature: document.getElementById('use_fixed_miniature').checked,

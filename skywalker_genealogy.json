@@ -1,45 +1,57 @@
 {
   "name": "Shmi Skywalker",
+  "birthdate": "????-07-13",
   "partner": {
-    "name": "Cliegg Lars"
+    "name": "Cliegg Lars",
+    "birthdate": "????-03-28"
   },
   "children": [
     {
       "name": "Anakin Skywalker",
+      "birthdate": "????-01-08",
       "caption": "Darth Vader",
       "partner": {
         "name": "Padmé Amidala",
+        "birthdate": "????-11-22",
         "caption": "Queen of Naboo"
       },
       "children": [
         {
           "name": "Luke Skywalker",
+          "birthdate": "????-04-01",
           "partner": {
             "name": "Mara Jade",
+            "birthdate": "????-10-18",
             "caption": "Emperor's Hand"
           },
           "children": [
             {
-              "name": "Ben Skywalker"
+              "name": "Ben Skywalker",
+              "birthdate": "????-02-30"
             }
           ]
         },
         {
           "name": "Leïa Organa",
+          "birthdate": "????-05-19",
           "caption": "Senator of Alderaan",
           "partner": {
+            "birthdate": "????-12-24",
             "name": "Han Solo"
           },
           "children": [
             {
-              "name": "Jaina Fel"
+              "name": "Jaina Fel",
+              "birthdate": "????-08-23"
             },
             {
               "name": "Jacen Solo",
+              "birthdate": "????-09-03",
               "caption": "Darth Caedus"
             },
             {
-              "name": "Anakin Solo"
+              "name": "Anakin Solo",
+              "birthdate": "????-06-12"
             }
           ]
         }

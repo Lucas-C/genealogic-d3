@@ -18,8 +18,8 @@ text.leaf.caption {
 }
 svg#genealogic-miniature {
   position: fixed;
-  top: 10%;
-  right: 10%;
+  top: 25%;
+  right: 5%;
 }
 circle.miniature.filled_with_img {
   stroke: black;
