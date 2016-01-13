@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <title>Calendrier d'anniversaires & trombinoscope généalogique de la famille {{geneaolgy_name}}</title>
+    <meta name="author" content="Lucas Cimon [ chezsoi.org/lucas ]"/>
+    <link rel="stylesheet" href="bundle-{{geneaolgy_name}}.css">
+  </head>
+  <body ng-app="BirthdayCalendar">
+    <script type="text/javascript" src="bundle-{{geneaolgy_name}}.js"></script>
+    <h3 style="text-align:center">Les anniversaires de la famille {{geneaolgy_name}}</h3>
+    <div ng-if="options && events" class="calendarContainer">
+      <flex-calendar options="options" events="events"></flex-calendar>
+    </div>
+    <br>
+    <h3 style="text-align:center">Le trombino de la famille {{geneaolgy_name}}</h3>
+    <svg width="1000" height="1000" id="genealogic-tree"/>
+    <svg id="genealogic-miniature"/>
+    <script type="text/javascript">
+      birthday_calendar('{{geneaolgy_name}}_genealogy.json');
+      genealogic_d3.generate({
+        json_genealogy: '{{geneaolgy_name}}_genealogy.json',
+        merge_root_partners: true,
+        path_to_miniature_imgs: 'miniatures_{{geneaolgy_name}}/',
+        miniature_photo_size: 200,
+        packing_generation_factor: 4.5
+      });
+    </script>
+  </body>
+</html>

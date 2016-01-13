@@ -1,12 +1,9 @@
 #!/bin/bash
 
-# This is simply a quick & dirty script,
-# it would have been better done in gulpfile.js
-
 set -o pipefail -o errexit -o nounset #-o xtrace
 
 MINIATURES_DIR=${1?'Missing miniatures directory path parameter'}
-OUT_CSS_FILE=src/birthday-calendar-genealogy.css
+OUT_CSS_FILE=${2?'Missing output CSS filename'}
 
 rm -f "$OUT_CSS_FILE"
 

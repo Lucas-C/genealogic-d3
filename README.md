@@ -3,7 +3,7 @@
 [KISS](http://en.wikipedia.org/wiki/KISS_principle) genealogy tree visualization depending on [d3.js](http://d3js.org) only.
 
 ## Demo
-https://chezsoi.org/lucas/genealogic-d3/skywalker.html
+https://chezsoi.org/lucas/genealogic-d3/
 
 ## Installation
 This tool can only display tree-like genealogies, e.g. all nodes are descendants of one given ancestor, like in a pedigree tree.
@@ -38,10 +38,10 @@ You can check the _skywalker\_genealogy.json_ for a complete example.
 
 The bundles also include the JS & CSS code for the birthday calendar:
 
-    ./generate-genealogy-css.sh miniatures_skywalker && gulp
+    make GENEALOGY=skywalker
 
 ### index.html template
-For the needs of the demo, _skywalker.html_ is a bit verbose. There is a basic HTML file skeleton to use `genealogic.d3` :
+For the needs of the demo, _index.html_ is a bit verbose. There is a basic HTML file skeleton to use `genealogic.d3` :
 
     <script type="text/javascript" src="bundle.js"></script>
     <svg width="1000" height="1000" id="genealogic-tree"/>
