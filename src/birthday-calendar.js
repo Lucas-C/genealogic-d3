@@ -40,7 +40,7 @@ birthday_calendar = (function () {
             .config(function ($translateProvider) {
                  $translateProvider.translations('fr', {
                      JANUARY: 'Janvier',
-                     FEBRUARY: 'Févier',
+                     FEBRUARY: 'Février',
                      MARCH: 'Mars',
                      APRIL: 'Avril',
                      MAI: 'Mai',
@@ -82,11 +82,11 @@ birthday_calendar = (function () {
                             }
                             var prevIndex = (date.index + date.event.length) % (date.event.length + 1);
                             if (prevIndex !== date.event.length) {
-                                var prevClass = 'birthday-' + date.event[prevIndex].node_name;
+                                var prevClass = 'birthday-' + date.event[prevIndex].node_name.replace(/ /g, '');
                                 event.currentTarget.classList.remove(prevClass);
                             }
                             if (date.index < date.event.length) {
-                                var newClass = 'birthday-' + date.event[date.index].node_name;
+                                var newClass = 'birthday-' + date.event[date.index].node_name.replace(/ /g, '');
                                 event.currentTarget.classList.add(newClass);
                             }
                         },

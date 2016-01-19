@@ -1,15 +1,15 @@
 # BEWARE ! Makefiles require the use of hard tabs
 
-ifndef GENEALOGY
-    $(error GENEALOGY is undefined)
+ifndef genealogy
+    $(error genealogy is undefined)
 endif
 
-INPUT_IMG_DIR=miniatures_$(GENEALOGY)/
+INPUT_IMG_DIR=miniatures_$(genealogy)/
 
-BIRTHDAY_CALENDAR_CSS=birthday-calendar-$(GENEALOGY).css
-OUT_CSS_BUNDLE=bundle-$(GENEALOGY).css
-OUT_JS_BUNDLE=bundle-$(GENEALOGY).js
-OUT_HTML=$(GENEALOGY)_family.html
+BIRTHDAY_CALENDAR_CSS=birthday-calendar-$(genealogy).css
+OUT_CSS_BUNDLE=bundle-$(genealogy).css
+OUT_JS_BUNDLE=bundle-$(genealogy).js
+OUT_HTML=$(genealogy)_family.html
 
 CSS_DEPS =  bower_components/flex-calendar/dist/flex-calendar.min.css
 JS_DEPS =   bower_components/angular/angular.min.js\
@@ -23,13 +23,13 @@ SRC_DIR	    := src/
 CSS_SRCS    := $(wildcard $(SRC_DIR)*.css)
 JS_SRCS     := $(wildcard $(SRC_DIR)*.js)
 
-.PHONY: install check check-css check-js pkg-upgrade-checker help
+.PHONY: install check pkg-upgrade-checker
 
 all: $(OUT_CSS_BUNDLE) $(OUT_JS_BUNDLE) $(OUT_HTML)
 	@:
 
 $(OUT_HTML): family_template.html
-	sed -e "s/{{geneaolgy_name}}/$(GENEALOGY)/g" $< > $@
+	sed -e "s/{{genealogy_name}}/$(genealogy)/g" $< > $@
 
 $(OUT_CSS_BUNDLE): $(CSS_DEPS) $(CSS_SRCS) $(BIRTHDAY_CALENDAR_CSS)
 	cat >$@ $^
@@ -37,18 +37,13 @@ $(OUT_CSS_BUNDLE): $(CSS_DEPS) $(CSS_SRCS) $(BIRTHDAY_CALENDAR_CSS)
 $(OUT_JS_BUNDLE): $(JS_DEPS) $(JS_SRCS)
 	cat >$@ $^
 
-$(BIRTHDAY_CALENDAR_CSS): $(INPUT_IMG_DIR)
-	./generate-genealogy-css.sh $< $@
+$(BIRTHDAY_CALENDAR_CSS): $(genealogy)_genealogy.json miniatures_$(genealogy)/*.jpg
+	./generate-genealogy-css.sh $(genealogy)
 
-check: check-css check-js
-	@:
-
-check_css: $(CSS_SRCS)
-	csslint $^
-
-check-js: $(JS_SRCS)
-	jshint $^
-	jscs $^
+check: $(CSS_SRCS) $(JS_SRCS)
+	csslint $(CSS_SRCS)
+	jshint $(JS_SRCS)
+	jscs $(JS_SRCS)
 
 install: bower.json
 	bower install
@@ -56,8 +51,3 @@ install: bower.json
 pkg-upgrade-checker:
 	bower list
 
-help:
-	# make -n target           # --dry-run : get targets description
-	# make -B target           # --always-make : force execution of targets commands, even if dependencies are satisfied
-	# make GENEALOGY=...       # variable override
-	# make --debug[=abijmv]    # enable variants of make verbose output

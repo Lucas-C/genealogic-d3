@@ -2,22 +2,24 @@
 
 set -o pipefail -o errexit -o nounset #-o xtrace
 
-MINIATURES_DIR=${1?'Missing miniatures directory path parameter'}
-OUT_CSS_FILE=${2?'Missing output CSS filename'}
+genealogy=${1?'Missing genealogy parameter'}
+out_css_file=birthday-calendar-${genealogy}.css
+img_dir=miniatures_${genealogy}
+img_ext=jpg
 
-rm -f "$OUT_CSS_FILE"
+rm -f "$out_css_file"
 
-for img in $MINIATURES_DIR/*; do
-    name=$(basename $img)
-    name=${name%.jpg}
-    cat <<EOF >>"$OUT_CSS_FILE"
-.birthday-${name} .number:after {
-    content: '$(echo $name | sed 's/[0-9]//g')' !important;
+jq -r '..|objects|.name' ${genealogy}_genealogy.json | while read name; do
+    name_without_spaces=$(echo ${name} | sed 's/ //g')
+    echo $(echo ${name} | sed 's/[0-9]//g')
+    cat <<EOF >>"$out_css_file"
+.birthday-${name_without_spaces} .number:after {
+    content: '$(echo ${name} | sed 's/[0-9]//g')' !important;
     line-height: 6.5rem;
     font-size: inherit !important;
 }
-.birthday-${name} .number {
-    background-image: url('$img');
+.birthday-${name_without_spaces} .number {
+    background-image: url('${img_dir}/${name_without_spaces}.${img_ext}');
 }
 EOF
 done

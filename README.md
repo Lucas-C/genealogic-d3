@@ -34,11 +34,11 @@ JSON genealogy structure :
 
 You can check the _skywalker\_genealogy.json_ for a complete example. 
 
-### Generating the JS & CSS bundles
+### Generating the JS & CSS bundles + a base HTML file
 
-The bundles also include the JS & CSS code for the birthday calendar:
+The bundles also include the JS & CSS code for the birthday calendar. The following will generate them, plus a HTML file containing both the calendar and genealogy, assuming there is a file called _${genealogy}\_genealogy.json_ and a directory _miniatures_${genealogy}/_ containing the pictures :
 
-    make GENEALOGY=skywalker
+    make genealogy=skywalker
 
 ### index.html template
 For the needs of the demo, _index.html_ is a bit verbose. There is a basic HTML file skeleton to use `genealogic.d3` :
