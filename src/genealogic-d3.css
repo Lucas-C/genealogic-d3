@@ -21,7 +21,7 @@ svg#genealogic-miniature {
   top: 25%;
   right: 5%;
 }
-circle.miniature.filled_with_img {
+circle.miniature {
   stroke: black;
   stroke-width: 2px;
 }
