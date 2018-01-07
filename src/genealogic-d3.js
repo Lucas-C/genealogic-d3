@@ -210,6 +210,7 @@ genealogic_d3 = (function () {
         var display_genealogy = function (json) {
             if (conf.merge_root_partners && json.partner) {
                 json.name = json.name + ' & ' + json.partner.name;
+                json.birthdate = json.birthdate + ' & ' + json.partner.birthdate;
                 delete json.partner;
             }
 
