@@ -1,0 +1,40 @@
+{
+  "name": "genealogic-d3",
+  "version": "0.1.0",
+  "description": "KISS genealogy tree visualization using d3.js + birthday calendar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lucas-C/genealogic-d3"
+  },
+  "keywords": [
+    "visualization",
+    "tree",
+    "calendar",
+    "genealogy",
+    "d3js",
+    "birthday"
+  ],
+  "author": "Lucas Cimon",
+  "license": "APL-1.0",
+  "bugs": {
+    "url": "https://github.com/Lucas-C/genealogic-d3/issues"
+  },
+  "homepage": "https://github.com/Lucas-C/genealogic-d3",
+  "dependencies": {
+    "angular": "1.4.8",
+    "angular-translate": "2.7.2",
+    "d3": "^3.4",
+    "flex-calendar": "1.0.0",
+    "moment": "2.4.0",
+    "moment-ferie-fr": "0.2.1"
+  },
+  "devDependencies": {
+    "csslint": "latest",
+    "jscs": "latest",
+    "jshint": "latest"
+  },
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch"
+  }
+}
