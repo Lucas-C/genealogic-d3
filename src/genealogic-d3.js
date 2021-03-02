@@ -16,6 +16,9 @@ genealogic_d3 = (function () {
         leaf_caption_dy: '3em',
         wrapped_text_line_height_ems: 1.5,
         post_rendering_callback: false,
+        display_leaf_name: true,
+        display_leaf_caption: true,
+        onmouseover: null,
     }),
     extend = function () { // jQuery.extend equivalent
         for (var i = 1; i < arguments.length; i++) {
@@ -37,6 +40,7 @@ genealogic_d3 = (function () {
         return name.replace(/[0-9]/g, '');
     },
     load_img_patterns = function (svg_defs, node, path_to_imgs, img_ext) {
+        if (!img_ext) return;
         add_img_pattern(svg_defs, node, path_to_imgs, img_ext);
         if (node.partner) {
             add_img_pattern(svg_defs, node.partner, path_to_imgs, img_ext);
@@ -116,6 +120,10 @@ genealogic_d3 = (function () {
         return 'M' + d.source.x + ',' + d.source.y + 'A' + dr + ',' + dr + ' 0 0,1 ' + d.target.x + ',' + d.target.y;
     },
     miniature_mouseover = function (d, conf) {
+        if (conf.onmouseover) {
+            conf.onmouseover(d);
+            return;
+        }
         var img_id = name_to_valid_id(d.name);
         if (!is_img_pattern_loaded(img_id)) {
             return;
@@ -236,14 +244,18 @@ genealogic_d3 = (function () {
                         .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; }),
                 leaf = node.filter(function(d) { return !d.children; });
 
-            leaf.append('svg:text')
-                .attr('class', 'leaf name')
-                .attr('dy', conf.leaf_name_dy)
-                .call(wrap_text, 'name', conf.wrapped_text_line_height_ems, name_to_displayed_text);
-            leaf.filter(function(d) { return d.caption; }).append('svg:text')
-                .attr('class', 'leaf caption')
-                .attr('dy', conf.leaf_caption_dy)
-                .call(wrap_text, 'caption', conf.wrapped_text_line_height_ems);
+            if (conf.display_leaf_name) {
+                leaf.append('svg:text')
+                    .attr('class', 'leaf name')
+                    .attr('dy', conf.leaf_name_dy)
+                    .call(wrap_text, 'name', conf.wrapped_text_line_height_ems, name_to_displayed_text);
+            }
+            if (conf.display_leaf_caption) {
+                leaf.filter(function(d) { return d.caption; }).append('svg:text')
+                    .attr('class', 'leaf caption')
+                    .attr('dy', conf.leaf_caption_dy)
+                    .call(wrap_text, 'caption', conf.wrapped_text_line_height_ems);
+            }
             leaf.append('svg:circle')
                 .attr('class', 'leaf')
                 .attr('r', function(d) { return d.r; })
