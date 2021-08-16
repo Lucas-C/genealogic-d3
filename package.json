@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/Lucas-C/genealogic-d3",
   "dependencies": {
-    "angular": "1.4.8",
+    "angular": "1.8.0",
     "angular-translate": "2.7.2",
     "d3": "^3.4",
     "flex-calendar": "1.0.0",
